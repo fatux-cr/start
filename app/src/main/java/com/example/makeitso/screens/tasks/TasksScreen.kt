@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 package com.example.makeitso.screens.tasks
 
@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.makeitso.R.drawable as AppIcon
 import com.example.makeitso.R.string as AppText
 import com.example.makeitso.common.composable.ActionToolbar
@@ -42,12 +43,18 @@ fun TasksScreen(
   openScreen: (String) -> Unit,
   viewModel: TasksViewModel = hiltViewModel()
 ) {
+  // 🔹 Recolecta el flujo de tareas desde el ViewModel
+  val tasks = viewModel
+    .tasks
+    .collectAsStateWithLifecycle(emptyList())
+
   TasksScreenContent(
     onAddClick = viewModel::onAddClick,
     onSettingsClick = viewModel::onSettingsClick,
     onTaskCheckChange = viewModel::onTaskCheckChange,
     onTaskActionClick = viewModel::onTaskActionClick,
-    openScreen = openScreen
+    openScreen = openScreen,
+    tasks = tasks
   )
 
   LaunchedEffect(viewModel) { viewModel.loadTaskOptions() }
@@ -62,7 +69,8 @@ fun TasksScreenContent(
   onSettingsClick: ((String) -> Unit) -> Unit,
   onTaskCheckChange: (Task) -> Unit,
   onTaskActionClick: ((String) -> Unit, Task, String) -> Unit,
-  openScreen: (String) -> Unit
+  openScreen: (String) -> Unit,
+  tasks: State<List<Task>> // 🔹 Se recibe el State directamente
 ) {
   Scaffold(
     floatingActionButton = {
@@ -87,12 +95,14 @@ fun TasksScreenContent(
       Spacer(modifier = Modifier.smallSpacer())
 
       LazyColumn {
-        items(emptyList<Task>(), key = { it.id }) { taskItem ->
+        items(tasks.value, key = { it.id }) { taskItem ->
           TaskItem(
             task = taskItem,
             options = listOf(),
             onCheckChange = { onTaskCheckChange(taskItem) },
-            onActionClick = { action -> onTaskActionClick(openScreen, taskItem, action) }
+            onActionClick = { action ->
+              onTaskActionClick(openScreen, taskItem, action)
+            }
           )
         }
       }
@@ -105,12 +115,22 @@ fun TasksScreenContent(
 @Composable
 fun TasksScreenPreview() {
   MakeItSoTheme {
+    val previewTasks = remember {
+      mutableStateOf(
+        listOf(
+          Task(id = "1", title = "Cortar el cabello", completed = false),
+          Task(id = "2", title = "Limpieza de herramientas", completed = true)
+        )
+      )
+    }
+
     TasksScreenContent(
       onAddClick = { },
       onSettingsClick = { },
       onTaskCheckChange = { },
       onTaskActionClick = { _, _, _ -> },
-      openScreen = { }
+      openScreen = { },
+      tasks = previewTasks
     )
   }
 }

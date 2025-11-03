@@ -24,9 +24,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.makeitso" />
-                  <option name="mobileSdkAppId" value="1:202555348623:android:55096103cb736a23f6c2fa" />
-                  <option name="projectId" value="lab11-e17d4" />
-                  <option name="projectNumber" value="202555348623" />
+                  <option name="mobileSdkAppId" value="1:63235220115:android:f2e175ffa86fc1ad512366" />
+                  <option name="projectId" value="lab04-5dbb4e67" />
+                  <option name="projectNumber" value="63235220115" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
